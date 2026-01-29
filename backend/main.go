@@ -8,5 +8,5 @@ import (
 func main() {
 	router := gin.Default()
 	router.GET("/topics", getTopics)
-	router.Run("localhost:8080")
+	router.Run(":8080")
 }
