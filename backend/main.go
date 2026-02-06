@@ -15,6 +15,7 @@ import (
 func main() {
 	// gin.SetMode(gin.ReleaseMode)
 	database.ConnectDatabase()
+	database.MigrateUsersTable(database.DB)
 	router := gin.Default()
 	router.GET("/topics", getTopics)
 	router.GET("/health", func(c *gin.Context) {

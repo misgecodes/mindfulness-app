@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	log "log"
 	"os"
 	"strconv"
 
@@ -35,5 +36,18 @@ func ConnectDatabase() {
 	} else {
 		DB = db
 		fmt.Println("Succssfully connected to database!")
+	}
+}
+
+func MigrateUsersTable(db *sql.DB) {
+	_, err := db.Exec(`
+        CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            username TEXT NOT NULL,
+            password TEXT NOT NULL
+        )
+    `)
+	if err != nil {
+		log.Fatal("Failed to migrate users table:", err)
 	}
 }
