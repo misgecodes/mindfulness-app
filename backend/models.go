@@ -9,8 +9,8 @@ type Topic struct {
 
 type Content struct {
 	ID      string `json:"id"`
-	Title   string `json:"title"`
 	TopicID string `json:"topic_id"`
+	Title   string `json:"title"`
 	Type    string `json:"type"`
 	Source  string `json:"source"`
 	URI     string `json:"uri"`
@@ -24,4 +24,10 @@ type UserTopic struct {
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 	IsActive  bool   `json:"is_active"`
+}
+
+type User struct {
+	ID       string `json:"id"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
