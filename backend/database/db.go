@@ -14,10 +14,9 @@ import (
 var DB *sql.DB
 
 func ConnectDatabase() {
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println("Error loading .env file")
-		return
+	// Only load .env locally, not on Render
+	if os.Getenv("GIN_MODE") != "release" {
+		_ = godotenv.Load()
 	}
 
 	host := os.Getenv("DB_HOST")
@@ -26,17 +25,23 @@ func ConnectDatabase() {
 	password := os.Getenv("DB_PASSWORD")
 	dbname := os.Getenv("DB_NAME")
 
-	psqlSetup := fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
-		host, port, user, dbname, password)
-	db, errSql := sql.Open("postgres", psqlSetup)
+	psqlSetup := fmt.Sprintf(
+		"host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
+		host, port, user, dbname, password,
+	)
 
-	if errSql != nil {
-		fmt.Println("There is an error while connecting to the database ", errSql)
-		panic(errSql)
-	} else {
-		DB = db
-		fmt.Println("Succssfully connected to database!")
+	db, err := sql.Open("postgres", psqlSetup)
+	if err != nil {
+		log.Fatal("Error opening database:", err)
 	}
+
+	// Ping ensures the connection is valid
+	if err := db.Ping(); err != nil {
+		log.Fatal("Error pinging database:", err)
+	}
+
+	DB = db
+	log.Println("Successfully connected to database!")
 }
 
 func MigrateUsersTable(db *sql.DB) {

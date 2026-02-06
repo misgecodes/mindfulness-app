@@ -13,7 +13,7 @@ import (
 // }
 
 func main() {
-	// gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.ReleaseMode)
 	database.ConnectDatabase()
 	database.MigrateUsersTable(database.DB)
 	router := gin.Default()
