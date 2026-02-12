@@ -60,9 +60,9 @@ func MigrateUsersTable(db *sql.DB) {
 func MigrateTopicsTable(db *sql.DB) {
 	_, err := db.Exec(` CREATE TABLE IF NOT EXISTS topics (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(150) NOT NULL,
+    name VARCHAR(100) NOT NULL,
     description TEXT,
-    is_active BOOLEAN DEFAULT FALSE,
+    is_active BOOLEAN DEFAULT FALSE
 ) `)
 	if err != nil {
 		log.Fatal("Failed to migrate topics table:", err)
@@ -71,7 +71,7 @@ func MigrateTopicsTable(db *sql.DB) {
 }
 
 func MigrateContentsTable(db *sql.DB) {
-	_, err := db.Exec(` CREATE TABLE contents (
+	_, err := db.Exec(` CREATE TABLE IF NOT EXISTS contents (
     id SERIAL PRIMARY KEY,
     topic_id INTEGER NOT NULL,
     title VARCHAR(200) NOT NULL,
