@@ -13,11 +13,14 @@ import (
 // }
 
 func main() {
-	gin.SetMode(gin.ReleaseMode)
+	// gin.SetMode(gin.ReleaseMode)
 	database.ConnectDatabase()
 	database.MigrateUsersTable(database.DB)
 	router := gin.Default()
 	router.GET("/topics", getTopics)
+	router.GET("/contents/:topic-id", getContents)
+	router.POST("/add-topic", addTopic)
+	router.POST("/add-content", addContent)
 	router.GET("/health", func(c *gin.Context) {
 		c.IndentedJSON(200, gin.H{"status": "OK"})
 	})

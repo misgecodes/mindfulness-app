@@ -1,18 +1,16 @@
 package main
 
 type Topic struct {
-	ID          string    `json:"id"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Content     []Content `json:"content"`
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	IsActive    bool   `json:"is_active"`
 }
 
 type Content struct {
-	ID      string `json:"id"`
-	TopicID string `json:"topic_id"`
+	ID      int    `json:"id"`
+	TopicID int    `json:"topic_id"`
 	Title   string `json:"title"`
-	Type    string `json:"type"`
-	Source  string `json:"source"`
 	URI     string `json:"uri"`
 	// Duration int    `json:"duration"`
 }

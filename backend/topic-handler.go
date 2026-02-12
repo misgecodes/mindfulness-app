@@ -9,68 +9,51 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func getTopics(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, topics)
-}
-
-func createUserTopic(c *gin.Context) {
-	c.IndentedJSON(http.StatusCreated, gin.H{"message": "User topic created"})
-}
-
-func updateUserTopic(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "User topic updated"})
-}
-
-func addUser(c *gin.Context) {
-	body := User{}
-	data, err := c.GetRawData()
-	if err != nil {
-		c.AbortWithStatusJSON(400, "User is not Defined")
+func getTopics(ctx *gin.Context) {
+	if database.DB == nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Database not initialized"})
 		return
 	}
-	err = json.Unmarshal(data, &body)
-	if err != nil {
-		c.AbortWithStatusJSON(400, "Bad Input")
-		return
-	}
-
-	_, err = database.DB.Exec("insert into users(id, username,password) values ($1, $2, $3)", body.ID, body.Username, body.Password)
-	if err != nil {
-		fmt.Println(err)
-		c.AbortWithStatusJSON(500, gin.H{"error": "Failed to create user", "details": err.Error()})
-	} else {
-		fmt.Println("User created successfully")
-		c.IndentedJSON(201, gin.H{"message": "User created successfully"})
-	}
-
-}
-
-func getUsers(ctx *gin.Context) {
-	// if database.DB == nil {
-	// 	ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Database not initialized"})
-	// 	return
-	// }
-
-	rows, err := database.DB.Query("SELECT id, username, password FROM users")
+	rows, err := database.DB.Query("select id, name, description, is_active from topics")
 	if err != nil {
 		fmt.Println("DB query error:", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
-		return
+		ctx.IndentedJSON(400, "Failed to Fetch Contents")
+
 	}
 	defer rows.Close()
 
-	users := []User{}
-
+	topics := []Topic{}
 	for rows.Next() {
-		var u User
-		err := rows.Scan(&u.ID, &u.Username, &u.Password)
+		var t Topic
+		err := rows.Scan(&t.ID, &t.Name, &t.Description, &t.IsActive)
 		if err != nil {
 			fmt.Println("Row scan error:", err)
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error reading user data"})
+			ctx.IndentedJSON(400, "Failed to Fetch Contents")
 			return
 		}
-		users = append(users, u)
+		topics = append(topics, t)
 	}
 
-	ctx.JSON(http.StatusOK, users)
+	ctx.IndentedJSON(http.StatusOK, topics)
+}
+
+func addTopic(ctx *gin.Context) {
+	topic := Topic{}
+	data, err := ctx.GetRawData()
+	if err != nil {
+		ctx.AbortWithStatusJSON(400, "Content is not Defined")
+		return
+	}
+
+	err = json.Unmarshal(data, &topic)
+	if err != nil {
+		ctx.AbortWithStatusJSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	_, err = database.DB.Exec("insert into topics(name, description) values ($1, $2)", topic.Name, topic.Description)
+	if err != nil {
+		fmt.Println(err)
+		ctx.Copy().AbortWithStatusJSON(500, gin.H{"error": "Failed to add topic", "details": err.Error()})
+	}
+	ctx.IndentedJSON(201, gin.H{"message": "Topic added successfully"})
 }
