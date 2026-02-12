@@ -56,3 +56,34 @@ func MigrateUsersTable(db *sql.DB) {
 		log.Fatal("Failed to migrate users table:", err)
 	}
 }
+
+func MigrateTopicsTable(db *sql.DB) {
+	_, err := db.Exec(` CREATE TABLE IF NOT EXISTS topics (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    description TEXT,
+    is_active BOOLEAN DEFAULT FALSE,
+) `)
+	if err != nil {
+		log.Fatal("Failed to migrate topics table:", err)
+	}
+
+}
+
+func MigrateContentsTable(db *sql.DB) {
+	_, err := db.Exec(` CREATE TABLE contents (
+    id SERIAL PRIMARY KEY,
+    topic_id INTEGER NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    uri TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_topic
+        FOREIGN KEY(topic_id)
+            REFERENCES topics(id)
+            ON DELETE CASCADE
+`)
+	if err != nil {
+		log.Fatal("Failed to migrate contents table:", err)
+	}
+}

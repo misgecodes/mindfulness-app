@@ -8,14 +8,12 @@ import (
 	// "github.com/go-playground/validator/v10/translations/id"
 )
 
-// func getTopics(c *gin.Context) {
-// 	c.IndentedJSON(http.StatusOK, topics)
-// }
-
 func main() {
 	// gin.SetMode(gin.ReleaseMode)
 	database.ConnectDatabase()
-	database.MigrateUsersTable(database.DB)
+	// database.MigrateUsersTable(database.DB)
+	database.MigrateContentsTable(database.DB)
+	database.MigrateTopicsTable(database.DB)
 	router := gin.Default()
 	router.GET("/topics", getTopics)
 	router.GET("/contents/:topic-id", getContents)
@@ -26,7 +24,5 @@ func main() {
 	})
 	router.POST("/add-user", addUser)
 	router.GET("/users", getUsers)
-	// router.POST("/user-topics", createUserTopic)
-	// router.PUT("/user-topics/:id", updateUserTopic)
 	router.Run(":8080")
 }
