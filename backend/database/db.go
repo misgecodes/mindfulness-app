@@ -82,7 +82,7 @@ func MigrateContentsTable(db *sql.DB) {
         FOREIGN KEY(topic_id)
             REFERENCES topics(id)
             ON DELETE CASCADE
-`)
+)`)
 	if err != nil {
 		log.Fatal("Failed to migrate contents table:", err)
 	}
