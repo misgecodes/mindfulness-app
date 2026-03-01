@@ -53,10 +53,12 @@ func MigrateUsersTable(db *sql.DB) {
 	//         email TEXT NOT NULL UNIQUE
 	//     )
 	_, err := db.Exec(`
-        ALTER TABLE users DROP COLUMN username;
+        ALTER TABLE users ADD COLUMN is_verified BOOLEAN DEFAULT FALSE;
     `)
 	if err != nil {
 		log.Fatal("Failed to migrate users table:", err)
+	} else {
+		log.Println("Users table migrated successfully!")
 	}
 }
 
@@ -104,5 +106,20 @@ func MigrateRefreshTokensTable(db *sql.DB) {
 		log.Fatal("Failed to migrate refresh_tokens table:", err)
 	} else {
 		log.Println("Refresh tokens table migrated successfully!")
+	}
+}
+
+func MigrateOTPTable(db *sql.DB) {
+	_, err := db.Exec(`CREATE TABLE otp_codes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    code TEXT NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    used BOOLEAN DEFAULT FALSE
+);`)
+	if err != nil {
+		log.Fatal("Failed to migrate otp_codes table:", err)
+	} else {
+		log.Println("OTP codes table migrated successfully!")
 	}
 }

@@ -5,14 +5,16 @@ import (
 	"encoding/base64"
 	"mindfulness-app/database"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	// "math/rand"
 )
 
 var (
-	JWTSecret       = []byte("your_secret_key") // change in production
+	JWTSecret       = []byte(os.Getenv("JWTSecret"))
 	AccessTokenTTL  = 15 * time.Minute
 	RefreshTokenTTL = 7 * 24 * time.Hour
 )
@@ -77,3 +79,16 @@ func RefereshAccessToken(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"access_token": accessToken})
 
 }
+
+func verifyOTP(otp string) bool {
+	return otp == "123456" // Placeholder for demonstration
+}
+
+// func generateOTP(length int) string {
+//     digits := "0123456789"
+//     otp := make([]byte, length)
+//     for i := range otp {
+//         otp[i] = digits[rand.Intn(len(digits))]
+//     }
+//     return string(otp)
+// }
