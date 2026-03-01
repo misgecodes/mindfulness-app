@@ -55,19 +55,24 @@ func DropUserTable(db *sql.DB) {
 func MigrateUsersTable(db *sql.DB) {
 
 	// ✅ Create users table
+	// _, err := db.Exec(`
+	// 	CREATE TABLE users (
+	// 		id SERIAL PRIMARY KEY,
+	// 		username TEXT ,
+	// 		password TEXT NOT NULL,
+	// 		email TEXT NOT NULL UNIQUE,
+	// 		is_verified BOOLEAN DEFAULT FALSE
+	// 	);
+	// `)
 	_, err := db.Exec(`
-		CREATE TABLE users (
-			id SERIAL PRIMARY KEY,
-			username TEXT NOT NULL,
-			password TEXT NOT NULL,
-			email TEXT NOT NULL UNIQUE,
-			is_verified BOOLEAN DEFAULT FALSE
-		);
-	`)
+    ALTER TABLE users 
+    ALTER COLUMN username DROP NOT NULL;
+`)
 	if err != nil {
-		log.Fatal("Failed to create users table:", err)
+		log.Fatal("Failed to Update users table:", err)
 	}
-	log.Println("Users table migrated successfully!")
+	log.Println("Users table Updated successfully!")
+
 }
 
 func MigrateTopicsTable(db *sql.DB) {
