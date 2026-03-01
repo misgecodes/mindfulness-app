@@ -11,7 +11,7 @@ import (
 func main() {
 	// gin.SetMode(gin.ReleaseMode)
 	database.ConnectDatabase()
-	// database.MigrateUsersTable(database.DB)
+	database.MigrateUsersTable(database.DB)
 	// database.MigrateTopicsTable(database.DB)
 	// database.MigrateContentsTable(database.DB)
 	// database.MigrateOTPTable(database.DB)
