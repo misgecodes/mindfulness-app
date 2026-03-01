@@ -45,26 +45,39 @@ func ConnectDatabase() {
 }
 
 func MigrateUsersTable(db *sql.DB) {
-	// 1️⃣ Drop the table if it exists
-	_, err := db.Exec(`DROP TABLE IF EXISTS users;`)
+	// ⚠️ WARNING: This will drop the entire database
+	_, err := db.Exec(`DROP DATABASE IF EXISTS your_db_name;`)
 	if err != nil {
-		log.Fatal("Failed to drop users table:", err)
+		log.Fatal("Failed to drop database:", err)
 	}
+	log.Println("Database dropped successfully!")
 
-	// 2️⃣ Create the table from scratch
-	_, err = db.Exec(`
-        CREATE TABLE users (
-            id SERIAL PRIMARY KEY,
-            username TEXT NOT NULL,
-            password TEXT NOT NULL,
-            email TEXT NOT NULL UNIQUE,
-            is_verified BOOLEAN DEFAULT FALSE
-        );
-    `)
+	_, err = db.Exec(`CREATE DATABASE your_db_name;`)
+	if err != nil {
+		log.Fatal("Failed to create database:", err)
+	}
+	log.Println("Database created successfully!")
+
+	// Reconnect to the newly created DB
+	newDB, err := sql.Open("postgres", "postgres://user:password@localhost:5432/your_db_name?sslmode=disable")
+	if err != nil {
+		log.Fatal("Failed to connect to the new database:", err)
+	}
+	defer newDB.Close()
+
+	// ✅ Create users table
+	_, err = newDB.Exec(`
+		CREATE TABLE users (
+			id SERIAL PRIMARY KEY,
+			username TEXT NOT NULL,
+			password TEXT NOT NULL,
+			email TEXT NOT NULL UNIQUE,
+			is_verified BOOLEAN DEFAULT FALSE
+		);
+	`)
 	if err != nil {
 		log.Fatal("Failed to create users table:", err)
 	}
-
 	log.Println("Users table migrated successfully!")
 }
 
