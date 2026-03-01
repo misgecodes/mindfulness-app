@@ -45,21 +45,27 @@ func ConnectDatabase() {
 }
 
 func MigrateUsersTable(db *sql.DB) {
-	// _, err := db.Exec(`
-	//     CREATE TABLE IF NOT EXISTS users (
-	//         id SERIAL PRIMARY KEY,
-	//         username TEXT NOT NULL,
-	//         password TEXT NOT NULL,
-	//         email TEXT NOT NULL UNIQUE
-	//     )
-	_, err := db.Exec(`
-        ALTER TABLE users ADD COLUMN is_verified BOOLEAN DEFAULT FALSE;
+	// 1️⃣ Drop the table if it exists
+	_, err := db.Exec(`DROP TABLE IF EXISTS users;`)
+	if err != nil {
+		log.Fatal("Failed to drop users table:", err)
+	}
+
+	// 2️⃣ Create the table from scratch
+	_, err = db.Exec(`
+        CREATE TABLE users (
+            id SERIAL PRIMARY KEY,
+            username TEXT NOT NULL,
+            password TEXT NOT NULL,
+            email TEXT NOT NULL UNIQUE,
+            is_verified BOOLEAN DEFAULT FALSE
+        );
     `)
 	if err != nil {
-		log.Fatal("Failed to migrate users table:", err)
-	} else {
-		log.Println("Users table migrated successfully!")
+		log.Fatal("Failed to create users table:", err)
 	}
+
+	log.Println("Users table migrated successfully!")
 }
 
 func MigrateTopicsTable(db *sql.DB) {
