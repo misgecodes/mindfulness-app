@@ -23,7 +23,7 @@ func main() {
 	router.POST("/refresh-token", RefereshAccessToken)
 
 	// Protected routes
-	auth := router.Group("/auth")
+	auth := router.Group("/api")
 	auth.Use(JWTAuth())
 	{
 		auth.GET("/contents/:topic-id", getContents)
