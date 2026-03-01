@@ -1,7 +1,7 @@
 package main
 
 import (
-	"encoding/json"
+	// "encoding/json"
 	"fmt"
 	"mindfulness-app/database"
 	"net/http"
@@ -15,30 +15,6 @@ func createUserTopic(c *gin.Context) {
 
 func updateUserTopic(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "User topic updated"})
-}
-
-func addUser(c *gin.Context) {
-	body := User{}
-	data, err := c.GetRawData()
-	if err != nil {
-		c.AbortWithStatusJSON(400, "User is not Defined")
-		return
-	}
-	err = json.Unmarshal(data, &body)
-	if err != nil {
-		c.AbortWithStatusJSON(400, "Bad Input")
-		return
-	}
-
-	_, err = database.DB.Exec("insert into users(id, username,password) values ($1, $2, $3)", body.ID, body.Username, body.Password)
-	if err != nil {
-		fmt.Println(err)
-		c.AbortWithStatusJSON(500, gin.H{"error": "Failed to create user", "details": err.Error()})
-	} else {
-		fmt.Println("User created successfully")
-		c.IndentedJSON(201, gin.H{"message": "User created successfully"})
-	}
-
 }
 
 func getUsers(ctx *gin.Context) {
@@ -59,7 +35,7 @@ func getUsers(ctx *gin.Context) {
 
 	for rows.Next() {
 		var u User
-		err := rows.Scan(&u.ID, &u.Username, &u.Password)
+		err := rows.Scan(&u.ID, &u.Email, &u.Password)
 		if err != nil {
 			fmt.Println("Row scan error:", err)
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error reading user data"})

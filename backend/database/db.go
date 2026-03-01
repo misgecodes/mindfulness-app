@@ -45,12 +45,15 @@ func ConnectDatabase() {
 }
 
 func MigrateUsersTable(db *sql.DB) {
+	// _, err := db.Exec(`
+	//     CREATE TABLE IF NOT EXISTS users (
+	//         id SERIAL PRIMARY KEY,
+	//         username TEXT NOT NULL,
+	//         password TEXT NOT NULL,
+	//         email TEXT NOT NULL UNIQUE
+	//     )
 	_, err := db.Exec(`
-        CREATE TABLE IF NOT EXISTS users (
-            id SERIAL PRIMARY KEY,
-            username TEXT NOT NULL,
-            password TEXT NOT NULL
-        )
+        ALTER TABLE users DROP COLUMN username;
     `)
 	if err != nil {
 		log.Fatal("Failed to migrate users table:", err)
@@ -85,5 +88,21 @@ func MigrateContentsTable(db *sql.DB) {
 )`)
 	if err != nil {
 		log.Fatal("Failed to migrate contents table:", err)
+	}
+}
+
+func MigrateRefreshTokensTable(db *sql.DB) {
+	_, err := db.Exec(` CREATE TABLE IF NOT EXISTS refresh_tokens (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token TEXT NOT NULL UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    expires_at TIMESTAMP NOT NULL,
+    is_revoked BOOLEAN NOT NULL DEFAULT FALSE
+);`)
+	if err != nil {
+		log.Fatal("Failed to migrate refresh_tokens table:", err)
+	} else {
+		log.Println("Refresh tokens table migrated successfully!")
 	}
 }
